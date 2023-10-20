@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>day counter</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .counted {
+            background-color: #c7ecc7;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        input[type="date"] {
+            padding: 8px;
+            margin: 5px;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #options {
+            display: flex;
+            align-items: center;
+        }
+
+        #days {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="options">
+        <label for="start">Choose a start date:</label>
+        <input type="date" id="start" name="start">
+    </div>
+
+    <div id="days">
+        <label for="days">Choose days of the week:</label>
+        <input type="checkbox" id="Sun" name="day" value="Sun">
+        <label for="Sun">Sun</label>
+        <input type="checkbox" id="Mon" name="day" value="Mon">
+        <label for="Mon">Mon</label>
+        <input type="checkbox" id="Tue" name="day" value="Tue">
+        <label for="Tue">Tue</label>
+        <input type="checkbox" id="Wed" name="day" value="Wed">
+        <label for="Wed">Wed</label>
+        <input type="checkbox" id="Thu" name="day" value="Thu">
+        <label for="Thu">Thu</label>
+        <input type="checkbox" id="Fri" name="day" value="Fri">
+        <label for="Fri">Fri</label>
+        <input type="checkbox" id="Sat" name="day" value="Sat">
+        <label for="Sat">Sat</label>
+    </div>
+
+    <div>
+        <button onclick="previousDay()">Previous Day</button>
+        <button onclick="nextDay()">Next Day</button>
+    </div>
+
+    <div id="result"></div>
+
+    <div>
+        <table id="calendar">
+            <thead>
+                <tr>
+                    <th>Sun</th>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thu</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+                </tr>
+            </thead>
+            <tbody id="calendar-body"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const startInput = document.getElementById('start');
+        const checkboxes = document.querySelectorAll('input[name="day"]');
+        const calendarBody = document.getElementById('calendar-body');
+        const resultElement = document.getElementById('result');
+        let currentDate = new Date(startInput.value);
+
+        function generateCalendar() {
+            const startDate = new Date(currentDate);
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + 1);
+            endDate.setDate(endDate.getDate() - 1);
+
+            calendarBody.innerHTML = '';
+            let count = 0;
+
+            while (startDate <= endDate) {
+                const dayOfWeek = startDate.getDay();
+                const newRow = calendarBody.insertRow();
+                for (let i = 0; i < 7; i++) {
+                    const newCell = newRow.insertCell();
+                    if (i === dayOfWeek) {
+                        newCell.innerHTML = startDate.getDate();
+                        if (checkboxes[dayOfWeek].checked) {
+                            count++;
+                            newCell.classList.add('counted');
+                        }
+                        newCell.addEventListener('click', () => {
+                            if (newCell.classList.contains('counted')) {
+                                newCell.classList.remove('counted');
+                                count--;
+                            } else {
+                                newCell.classList.add('counted');
+                                count++;
+                            }
+                            resultElement.textContent = `Total count: ${count}`;
+                        });
+                        startDate.setDate(startDate.getDate() + 1);
+                    }
+                }
+            }
+            resultElement.textContent = `Total count: ${count}`;
+        }
+
+        function handleCheckboxChange() {
+            generateCalendar();
+        }
+
+        function previousDay() {
+            currentDate.setDate(currentDate.getDate() - 1);
+            generateCalendar();
+        }
+
+        function nextDay() {
+            currentDate.setDate(currentDate.getDate() + 1);
+            generateCalendar();
+        }
+
+        startInput.addEventListener('change', () => {
+            currentDate = new Date(startInput.value);
+            generateCalendar();
+        });
+
+        checkboxes.forEach((checkbox) => checkbox.addEventListener('change', handleCheckboxChange));
+
+        generateCalendar(); // Initial generation
+    </script>
+
+</body>
+
+</html>
